@@ -1,16 +1,23 @@
 # Send-O365MailMessage
-  
+    
 This is a rework of the fantastic script here: https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1  
 **Kudos to gscales**. 
 There are so many changes, that this wasn't forked, because of the different intention to use the script.  
   
-the fact SMTP Basic Auth will be disabled, leads -for PowerShell scripts that are required to send Emails via SMTP- to some issues.  
+## Deprecation of Exchange online SMTP Basic auth  
+Microsoft will disable SMTP Basic auth in the second half of 2021 see [here](https://docs.microsoft.com/en-us/lifecycle/announcements/exchange-online-basic-auth-deprecated), [here](https://developer.microsoft.com/de-de/office/blogs/deferred-end-of-support-date-for-basic-authentication-in-exchange-online/) or in [MessageCenter](https://app.cloudscout.one/evergreen-item/mc237741/)  
+
+For PowerShell sending Emails a soulution is needed.  
+
+## Challange
+The fact SMTP Basic Auth will be disabled, leads -for PowerShell scripts that are required to send Emails via SMTP- to some issues.  
 The change from SMTP basic Auth to XOAUTH2 has lots of implications, caveats and obstacles.  
 While looking myself for a solution the internet gave me the advice to use another external mail provider which allows STMP  in not using the internal SMTP solution. But this will decrease security instead of increasing it. And I not sure how many developers already gone down this road.  
   
 The recommended way by Microsoft is to use “MailKit” as a library together with MSAL. The downside here is, that MailKit does not work with PowerShell 5.1. For MailKit PowerShell 7 is needed. But it is no option to install PowerShell 7 on every system and migrate each and every PowerShell 5 script to 7.  
 The good news are, that there is a PowerShell module from the PowerShell Gallery MSAL.PS that works on PowerShell 5.1 and uses MSAL as library.  
-  
+
+## Solution
 Long story told short:  
 The solution I propose is to register one(!) App for all clients in AzureAD (Public App / User credentials)  
 With the following properties:  
@@ -48,7 +55,8 @@ to incorporate the functions into your script simply dot-source start the script
   
 `. "<path ti script>\Send-O365MailMessage.ps1"` (see: https://devblogs.microsoft.com/scripting/how-to-reuse-windows-powershell-functions-in-scripts/)  
   
-  
+
+## Syntax
 Syntax:  
    
  -Credential  -> PSCredentialObject (Username and Password of the sending Office 365 account) (Mandandtory)  
