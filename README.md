@@ -65,4 +65,4 @@ Syntax:
  -BodyAsHTML  -> Switch indicated if Body is in html  
  -Encoding    -> Encoding of the subject and the body one of "ASCII","UTF8","UniCode","UTF32","UTF7" (optional) defaults to "UTF8"  
  -From        -> From email adress. (optional) defaults to UserName from PSCredential Object    
-
+ -Priority    -> one of "Low", "High", "Normal". (optional) defaults to "Normal"
