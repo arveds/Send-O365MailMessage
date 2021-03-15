@@ -1,5 +1,7 @@
 # send smtp email with OAUTH (modern authentication) to Exhange online in PowerShell 5.1
 #
+# based on the highly apreciated work of gscales @ https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1
+#
 # Source: https://github.com/arveds/Send-O365MailMessage/
 #
 # the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
@@ -142,7 +144,11 @@ function Send-O365MailMessage{
         $BodyAsHTML,
         [Parameter(Mandatory = $false)]
         [String]
-        $Encoding = "UTF8"
+        $Encoding = "UTF8",
+        [Parameter(Mandatory = $false)]
+        [String]
+        $Priority = "Normal"
+
     )
     Process {       
 
@@ -160,7 +166,7 @@ function Send-O365MailMessage{
         if([String]::IsNullOrEmpty($RedirectURI)){
             $RedirectURI = "msal" + $ClientId + "://auth" 
         } 
-               
+        # Building MailMessage Object       
         $mailMessage = New-Object System.Net.Mail.MailMessage
         $mailMessage.From = New-Object System.Net.Mail.MailAddress($SendingAddress)
         Foreach ($item in $to) {
@@ -209,7 +215,6 @@ function Send-O365MailMessage{
                 }
             }
         }
-        $RCPTObj = $mailMessage.to + $mailMessage.CC + $mailMessage.Bcc
         $mailMessage.Subject = $Subject
         $mailMessage.Body = $Body
         if($BodyAsHTML){
@@ -222,9 +227,21 @@ function Send-O365MailMessage{
             "UTF32" { $encodingObj = New-Object System.Text.UTF32Encoding }
             "UTF7" { $encodingObj = New-Object System.Text.UTF7Encoding }
         }
+        #
+        switch ($Priority ){
+            "Normal" { $mailMessage.Priority = 0 }
+            "High" { $mailMessage.Priority = 2  }
+            "Low" { $mailMessage.Priority = 1  }
+        }
         $mailMessage.BodyEncoding = $encodingObj
         $mailMessage.SubjectEncoding = $encodingObj
-        #breakpoint
+        #MailMessage Obj done
+
+        # obj for multiple recipients needed for plain SMTP communication
+        $RCPTObj = $mailMessage.to + $mailMessage.CC + $mailMessage.Bcc
+        # used later in SMTP part
+
+        # converting  MailMessage obj to Message String - somewhat magic
         $binding = [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic
         $MessageType = $mailMessage.GetType()
         $smtpClient = New-Object System.Net.Mail.SmtpClient
@@ -258,6 +275,9 @@ function Send-O365MailMessage{
         [Void]$MemoryStream.Dispose()
         [Void]$mailMessage.Dispose()
         $MessageString = $MessageString.SubString($MessageString.IndexOf("MIME-Version:"))
+        # Messagestring constructed
+        
+        # connect to SMTP server direct via network 
         $socket = new-object System.Net.Sockets.TcpClient($SMTPServer, $Port)
         $stream = $socket.GetStream()
         $streamWriter = new-object System.IO.StreamWriter($stream)
@@ -279,6 +299,9 @@ function Send-O365MailMessage{
         if (!$ehloResponse.StartsWith("250")){
             throw "Error in ehelo Response"
         }
+        #connection established
+
+        # starttls encryption
         Write-Host("STARTTLS") -ForegroundColor Green
         $streamWriter.WriteLine("STARTTLS");
         $startTLSResponse = $streamReader.ReadLine();
@@ -291,6 +314,9 @@ function Send-O365MailMessage{
         $SSLstreamWriter.WriteLine(("helo " + $Domain));
         $ehloResponse = $SSLstreamReader.ReadLine();
         Write-Host($ehloResponse)
+        # starttls done
+
+        # Authentication OAUTH
         $command = "AUTH XOAUTH2" 
         write-host -foregroundcolor DarkGreen $command
         $SSLstreamWriter.WriteLine($command) 
@@ -303,13 +329,18 @@ function Send-O365MailMessage{
         $SSLstreamWriter.WriteLine($Base64AuthSALS)        
         $AuthResponse = $SSLstreamReader.ReadLine()
         write-host $AuthResponse
+        # Auth done
+
+        # Write Message via SMTP commands
         if($AuthResponse.StartsWith("235")){
+            # Write FROM to SMTP Server
             $command = "MAIL FROM: <" + $SendingAddress + ">" 
             write-host -foregroundcolor DarkGreen $command
             $SSLstreamWriter.WriteLine($command) 
             $FromResponse = $SSLstreamReader.ReadLine()
             write-host $FromResponse
 
+            # Write all recipients to SMTP Server
             Foreach ($rcptitem in $RCPTObj){
                 $command = "RCPT TO: <" + $rcptitem.Address + ">" 
                 write-host -foregroundcolor DarkGreen $command
@@ -318,6 +349,7 @@ function Send-O365MailMessage{
                 write-host $ToResponse
             }
 
+            # Send Data
             $command = "DATA"
             write-host -foregroundcolor DarkGreen $command
             $SSLstreamWriter.WriteLine($command) 
