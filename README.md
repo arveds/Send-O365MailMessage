@@ -28,7 +28,7 @@ For PowerShell 5.1 which is included in every Windows, I set up a script to prov
 the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 To use  
 `Install-Module MSAL.ps`  
-you `need to run though this:  
+you need to run though this:  
 `Update-Module'  
 `Get-Module`  
 check if PowerShellGet is highet than 1.0.0.1  
