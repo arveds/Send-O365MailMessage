@@ -4,13 +4,13 @@
 # To use  
 # `Install-Module MSAL.ps`  
 # you `need to run though this:
-# `Update-Module'
+# `Ùpdate-Module`
 # `Get-Module`
-# check if PowerShellGet is highet than 1.0.0.1
+# check if PowerShellGet is higher than 1.0.0.1
 # `Set-ExecutionPolicy RemoteSigned` <- needed for Module to run
 # `Install-PackageProvider Nuget –force –verbose`
 # `Install-Module -Name PowerShellGet -Force -AllowClobber`
-# `exit` <- important
+# `Èxit` <- important
 # close shell and ISE and check back again
 #
 # The Email Body is sent diretly plain via the SMTP DATA command
@@ -94,150 +94,6 @@ function Get-AccessTokenForSMTPSending {
 		
     }
     
-}
-
-function Get-SMTPTLSCert {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $SMTPServer,
-        [Parameter(Mandatory = $true)]
-        [String]
-        $Sendingdomain,
-        [Parameter(Mandatory = $true)]
-        [String]
-        $CertificateFilePath,
-        [int]
-        $Port = 587
-    )
-    Process {
-        $socket = new-object System.Net.Sockets.TcpClient($SMTPServer, $Port)
-        $stream = $socket.GetStream()
-        $streamWriter = new-object System.IO.StreamWriter($stream)
-        $streamReader = new-object System.IO.StreamReader($stream)
-        $stream.ReadTimeout = 5000
-        $stream.WriteTimeout = 5000   
-        $streamWriter.AutoFlush = $true
-        $sslStream = New-Object System.Net.Security.SslStream($stream)    
-        $sslStream.ReadTimeout = 5000
-        $sslStream.WriteTimeout = 5000        
-        $ConnectResponse = $streamReader.ReadLine();
-        Write-Host($ConnectResponse)
-        if(!$ConnectResponse.StartsWith("220")){
-            throw "Error connecting to the SMTP Server"
-        }
-        Write-Host(("helo " + $FromHeloString)) -ForegroundColor Green
-        $streamWriter.WriteLine(("helo " + $Sendingdomain));
-        $ehloResponse = $streamReader.ReadLine();
-        Write-Host($ehloResponse)
-        if (!$ehloResponse.StartsWith("250")){
-            throw "Error in ehelo Response"
-        }
-        Write-Host("STARTTLS") -ForegroundColor Green
-        $streamWriter.WriteLine("STARTTLS");
-        $startTLSResponse = $streamReader.ReadLine();
-        Write-Host($startTLSResponse)
-        $ccCol = New-Object System.Security.Cryptography.X509Certificates.X509CertificateCollection
-        $sslStream.AuthenticateAsClient($SMTPServer,$ccCol,[System.Security.Authentication.SslProtocols]::Tls12,$false);        
-        $Cert = $sslStream.RemoteCertificate.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert);
-        [System.IO.File]::WriteAllBytes($CertificateFilePath, $Cert);
-        $stream.Dispose()
-        $sslStream.Dispose()
-        Write-Host("File written to " + $CertificateFilePath)
-        Write-Host("Done")
-    }
-}
-
-function Invoke-TestSMTPTLSwithOAuth {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $SMTPServer,
-        [Parameter(Mandatory = $true)]
-        [String]
-        $SendingAddress,
-        [Parameter(Mandatory = $true)]
-        [String]
-        $To,
-        [int]
-        $Port = 587,
-        [Parameter(Mandatory = $false)]
-        [String]
-        $ClientId,
-        [Parameter(Mandatory = $false)]
-        [String]
-        $RedirectURI
-    )
-    Process {
-
-        $socket = new-object System.Net.Sockets.TcpClient($SMTPServer, $Port)
-        $stream = $socket.GetStream()
-        $streamWriter = new-object System.IO.StreamWriter($stream)
-        $streamReader = new-object System.IO.StreamReader($stream)
-        $streamWriter.AutoFlush = $true
-        $sslStream = New-Object System.Net.Security.SslStream($stream)
-        $sslStream.ReadTimeout = 25000
-        $sslStream.WriteTimeout = 25000        
-        $ConnectResponse = $streamReader.ReadLine();
-        Write-Host($ConnectResponse)
-        if(!$ConnectResponse.StartsWith("220")){
-            throw "Error connecting to the SMTP Server"
-        }
-        $Domain = $SendingAddress.Split('@')[1]
-        Write-Host(("helo " + $Domain)) -ForegroundColor Green
-        $streamWriter.WriteLine(("helo " + $Domain));
-        $ehloResponse = $streamReader.ReadLine();
-        Write-Host($ehloResponse)
-        if (!$ehloResponse.StartsWith("250")){
-            throw "Error in ehelo Response"
-        }
-        Write-Host("STARTTLS") -ForegroundColor Green
-        $streamWriter.WriteLine("STARTTLS");
-        $startTLSResponse = $streamReader.ReadLine();
-        Write-Host($startTLSResponse)
-        $ccCol = New-Object System.Security.Cryptography.X509Certificates.X509CertificateCollection
-        $sslStream.AuthenticateAsClient($SMTPServer,$ccCol,[System.Security.Authentication.SslProtocols]::Tls12,$false);        
-        $SSLstreamReader = new-object System.IO.StreamReader($sslStream)
-        $SSLstreamWriter = new-object System.IO.StreamWriter($sslStream)
-        $SSLstreamWriter.AutoFlush = $true
-        $SSLstreamWriter.WriteLine(("helo " + $Domain));
-        $ehloResponse = $SSLstreamReader.ReadLine();
-        Write-Host($ehloResponse)
-        $command = "AUTH XOAUTH2" 
-        write-host -foregroundcolor DarkGreen $command
-        $SSLstreamWriter.WriteLine($command) 
-        $AuthLoginResponse = $SSLstreamReader.ReadLine()
-        write-host ($AuthLoginResponse)
-        $token = Get-AccessTokenForAzure -MailboxName $SendingAddress -ClientId $ClientId -RedirectURI $RedirectURI
-        $Bytes = [System.Text.Encoding]::ASCII.GetBytes(("user=" + $SendingAddress + [char]1 + "auth=Bearer " + $token + [char]1 + [char]1))
-        $Base64AuthSALS = [Convert]::ToBase64String($Bytes)     
-        write-host -foregroundcolor DarkGreen $Base64AuthSALS
-        $SSLstreamWriter.WriteLine($Base64AuthSALS)        
-        $AuthResponse = $SSLstreamReader.ReadLine()
-        write-host $AuthResponse
-        if($AuthResponse.StartsWith("235")){
-            $command = "MAIL FROM: <" + $SendingAddress + ">" 
-            write-host -foregroundcolor DarkGreen $command
-            $SSLstreamWriter.WriteLine($command) 
-            $FromResponse = $SSLstreamReader.ReadLine()
-            write-host $FromResponse
-            $command = "RCPT TO: <" + $To + ">" 
-            write-host -foregroundcolor DarkGreen $command
-            $SSLstreamWriter.WriteLine($command) 
-            $ToResponse = $SSLstreamReader.ReadLine()
-            write-host $ToResponse
-            $command = "QUIT" 
-            write-host -foregroundcolor DarkGreen $command
-            $SSLstreamWriter.WriteLine($command) 
-            # ## Close the streams 
-            $stream.Close() 
-            $sslStream.Close()
-            Write-Host("Done")
-        }  
-
-    }
 }
 
 function Send-O365MailMessage{
