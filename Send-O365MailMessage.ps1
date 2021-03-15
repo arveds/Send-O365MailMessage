@@ -1,16 +1,18 @@
 # send smtp email with OAUTH (modern authentication) to Exhange online in PowerShell 5.1
 #
+# Source: https://github.com/arveds/Send-O365MailMessage/
+#
 # the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 # To use  
 # `Install-Module MSAL.ps`  
 # you `need to run though this:
-# `Ùpdate-Module`
+# `Update-Module`
 # `Get-Module`
 # check if PowerShellGet is higher than 1.0.0.1
 # `Set-ExecutionPolicy RemoteSigned` <- needed for Module to run
 # `Install-PackageProvider Nuget –force –verbose`
 # `Install-Module -Name PowerShellGet -Force -AllowClobber`
-# `Èxit` <- important
+# `exit` <- important
 # close shell and ISE and check back again
 #
 # The Email Body is sent diretly plain via the SMTP DATA command
