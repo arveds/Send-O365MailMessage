@@ -1,7 +1,6 @@
 # send smtp email with OAUTH (modern authentication) to Exhange online in PowerShell 5.1
 # the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 # The Email Body is sent diretly plain via the SMTP DATA command
-# all the formatting, MIME stuff and so on needs to be done manually in the script
 # The main function is called Send-O365MailMessage.
 # you may also use the other functions seperatly
 # to incorporate the functions into your script simply dot-scource start the script from your ps1:
