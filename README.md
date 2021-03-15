@@ -29,7 +29,7 @@ the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 To use  
 `Install-Module MSAL.ps`  
 you need to run though this:  
-`Update-Module'  
+`Update-Module`   
 `Get-Module`  
 check if PowerShellGet is highet than 1.0.0.1  
 `Set-ExecutionPolicy RemoteSigned` <- needed for Module to run  
