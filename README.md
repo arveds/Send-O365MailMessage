@@ -18,7 +18,8 @@ The recommended way by Microsoft is to use “MailKit” as a library together w
 The good news are, that there is a PowerShell module from the PowerShell Gallery MSAL.PS that works on PowerShell 5.1 and uses MSAL as library.  
 
 ## Solution
-Long story told short:  
+Long story told short: 
+### Azure AD App registration
 The solution I propose is to register one(!) App for all clients in AzureAD (Public App / User credentials)  
 With the following properties:  
 API Permissions: SMTP.Send  
@@ -29,9 +30,10 @@ Authentication: Supported Accout types: Single tenant (your directory)
 No client secret needed.  
 The respective user account for sending emails has to give user consent or must be added to the app by an AAD Admin as user.  
 This app can be used by any solution authentication through user credential (Username / Password)  
-  
+
+### MSAL.PS Setup
 For PowerShell 5.1 which is included in every Windows, I set up a script to provide a proof-of concept code working with MSAL (and MSAL.PS to make things easier).  
-  
+
 the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 To use  
 `Install-Module MSAL.ps`  
@@ -44,6 +46,8 @@ check if PowerShellGet is higher than 1.0.0.1
 `Install-Module -Name PowerShellGet -Force -AllowClobber`  
 `Exit` <- important  
 close shell and ISE and check back again  
+  
+### Send-O365MailMessage.ps1  
 This script implements -more or less- a handcrafted SMTP STARTTLS XOAUTH2 client.  
   
 If there are better ways, any solution is very welcome  
