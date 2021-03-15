@@ -7,7 +7,7 @@ There are so many changes, that this wasn't forked, because of the different int
 the fact SMTP Basic Auth will be disabled, leads -for PowerShell scripts that are required to send Emails via SMTP- to some issues.  
 The change from SMTP basic Auth to XOAUTH2 has lots of implications, caveats and obstacles.  
 While looking myself for a solution the internet gave me the advice to use another external mail provider which allows STMP  in not using the internal SMTP solution. But this will decrease security instead of increasing it. And I not sure how many developers already gone down this road.  
-Tring to make tings right, there are more obstacles.  
+  
 The recommended way by Microsoft is to use “MailKit” as a library together with MSAL. The downside here is, that MailKit does not work with PowerShell 5.1. For MailKit PowerShell 7 is needed. But it is no option to install PowerShell 7 on every system and migrate each and every PowerShell 5 script to 7.  
 The good news are, that there is a PowerShell module from the PowerShell Gallery MSAL.PS that works on PowerShell 5.1 and uses MSAL as library.  
   
