@@ -28,7 +28,7 @@ For PowerShell 5.1 which is included in every Windows, I set up a script to prov
 the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 To use  
 `Install-Module MSAL.ps`  
-you need to run though this:  
+you might need to run though this:  
 `Update-Module`   
 `Get-Module`  
 check if PowerShellGet is higher than 1.0.0.1  
@@ -44,7 +44,7 @@ If there are better ways, any solution is very welcome
 The syntax is very similar to the Send-MailMessage.  
   
 you may also use the other functions seperatly  
-to incorporate the functions into your script simply dot-scource start the script from your ps1:  
+to incorporate the functions into your script simply dot-source start the script from your ps1:  
   
 `. "<path ti script>\Send-O365MailMessage.ps1"` (see: https://devblogs.microsoft.com/scripting/how-to-reuse-windows-powershell-functions-in-scripts/)  
   
