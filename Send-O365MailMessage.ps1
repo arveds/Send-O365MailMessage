@@ -56,10 +56,10 @@ function Get-AccessTokenForSMTPSending {
         [Parameter(Position = 1, Mandatory = $true)]
         [Object]
         $Credential,
-        [Parameter(Position = 2, Mandatory = $false)]
+        [Parameter(Position = 2, Mandatory = $true)]
         [String]
         $ClientId,
-        [Parameter(Position = 3, Mandatory = $false)]
+        [Parameter(Position = 3, Mandatory = $true)]
         [String]
         $RedirectURI,
         [Parameter(Position = 4, Mandatory = $false)]
