@@ -31,7 +31,7 @@ To use
 you need to run though this:  
 `Update-Module`   
 `Get-Module`  
-check if PowerShellGet is highet than 1.0.0.1  
+check if PowerShellGet is higher than 1.0.0.1  
 `Set-ExecutionPolicy RemoteSigned` <- needed for Module to run  
 `Install-PackageProvider Nuget –force –verbose`  
 `Install-Module -Name PowerShellGet -Force -AllowClobber`  
