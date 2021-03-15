@@ -46,7 +46,7 @@ The syntax is very similar to the Send-MailMessage.
 you may also use the other functions seperatly  
 to incorporate the functions into your script simply dot-scource start the script from your ps1:  
   
-. "<path ti script>\Send-O365MailMessage.ps1" (see: https://devblogs.microsoft.com/scripting/how-to-reuse-windows-powershell-functions-in-scripts/)  
+`. "<path ti script>\Send-O365MailMessage.ps1"` (see: https://devblogs.microsoft.com/scripting/how-to-reuse-windows-powershell-functions-in-scripts/)  
   
   
 Syntax:  
