@@ -23,7 +23,11 @@ No client secret needed.
 The respective user account for sending emails has to give user consent or must be added to the app by an AAD Admin as user.  
 This app can be used by any solution authentication through user credential (Username / Password)  
   
-For PowerShell 5.1 which is included in every Windows, I set up a script to provide a proof-of concept code working with MSAL (and MSAL.PS to make things easier)
+For PowerShell 5.1 which is included in every Windows, I set up a script to provide a proof-of concept code working with MSAL (and MSAL.PS to make things easier).  
+To use  
+`Install-Module MSAL.ps`  
+you might use  
+`Install-Module -Name PowerShellGet -Force`
 This script implements -more or less- a handcrafted SMTP STARTTLS XOAUTH2 client.  
   
 If there are better ways, any solution is very welcome  
