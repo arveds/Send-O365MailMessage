@@ -57,7 +57,7 @@ Syntax:
  -To  	      -> Recipent email (mandantory)  
  -Cc          -> cc (optional)  
  -Bcc         -> bcc (optional)  
-              -> Email Adresses can be added as '`Name somewhat <name@emaildomain.com>`' or '`anothername@emaildomain.com`' as an array `-to 'email1@domain.com','Its me <<email2@domain.com>'`  
+              -> Email Adresses can be added as `'Name somewhat <name@emaildomain.com>'` or `'anothername@emaildomain.com'` or as an array `-to 'email1@domain.com','Its me <email2@domain.com>'`  
  -Subject     -> Email Subject (mandantory)  
  -Body        -> Email content (mandantory)  
  -AttachmentFileName -> (optional)  
