@@ -24,14 +24,22 @@ The respective user account for sending emails has to give user consent or must 
 This app can be used by any solution authentication through user credential (Username / Password)  
   
 For PowerShell 5.1 which is included in every Windows, I set up a script to provide a proof-of concept code working with MSAL (and MSAL.PS to make things easier).  
+  
+the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 To use  
 `Install-Module MSAL.ps`  
-you might use  
-`Install-Module -Name PowerShellGet -Force`
+you `need to run though this:  
+`Update-Module'  
+`Get-Module`  
+check if PowerShellGet is highet than 1.0.0.1  
+`Set-ExecutionPolicy RemoteSigned` <- needed for Module to run  
+`Install-PackageProvider Nuget –force –verbose`  
+`Install-Module -Name PowerShellGet -Force -AllowClobber`  
+`Exit` <- important  
+close shell and ISE and check back again  
 This script implements -more or less- a handcrafted SMTP STARTTLS XOAUTH2 client.  
   
 If there are better ways, any solution is very welcome  
-  
   
 The syntax is very similar to the Send-MailMessage.  
   
