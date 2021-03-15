@@ -5,7 +5,7 @@
 # the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
 # To use  
 # `Install-Module MSAL.ps`  
-# you `need to run though this:
+# you need to run though this:
 # `Update-Module`
 # `Get-Module`
 # check if PowerShellGet is higher than 1.0.0.1
@@ -16,9 +16,10 @@
 # close shell and ISE and check back again
 #
 # The Email Body is sent diretly plain via the SMTP DATA command
-# all the formatting, MIME stuff and so on needs to be done manually in the script
+#
 # The main function is called Send-O365MailMessage.
-# you may also use the other functions seperatly
+#
+# you may also use the functions seperatly
 # to incorporate the functions into your script simply dot-scource start the script from your ps1:
 #
 # . "<path ti script>\Send-O365MailMessage.ps1" (see: https://devblogs.microsoft.com/scripting/how-to-reuse-windows-powershell-functions-in-scripts/)
@@ -32,7 +33,6 @@
 # Authentication: Redirect URI: the msal.....//auth (MSAL (only) Uri must be checked
 # Authentication: Allow public client flows: Yes
 # Authentication: Supported Accout types: Single tenant (your directory)
-#
 #
 #
 # what you need for the function:
