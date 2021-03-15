@@ -240,18 +240,6 @@ function Invoke-TestSMTPTLSwithOAuth {
     }
 }
 
-function readResponse() {
-    while($stream.DataAvailable)
-    {
-        $buffer = new-object System.Byte[] 1024
-        $read = $stream.Read($buffer, 0, 1024)
-        $rstring = $encoding.GetString($buffer, 0, $read)
-        Write-Host $rstring
-    }
-}
-
-
-
 function Send-O365MailMessage{
     [CmdletBinding()]
     param (
