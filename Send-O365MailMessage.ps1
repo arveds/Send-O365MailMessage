@@ -528,11 +528,6 @@ function Send-O365MailMessage{
         else{
             $SendingAddress = $From
         }
-
-        if(![String]::IsNullOrEmpty($AttachmentFileName)){
-            $attachment = New-Object System.Net.Mail.Attachment -ArgumentList $AttachmentFileName
-            $mailMessage.Attachments.Add($attachment);
-        }
         if([String]::IsNullOrEmpty($RedirectURI)){
             $RedirectURI = "msal" + $ClientId + "://auth" 
         } 
