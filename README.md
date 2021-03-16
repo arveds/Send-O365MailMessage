@@ -72,9 +72,10 @@ Syntax:
               -> Email Adresses can be added as `'Name somewhat <name@emaildomain.com>'` or `'anothername@emaildomain.com'` or as an array `-to 'email1@domain.com','Its me <email2@domain.com>'`  
  -Subject     -> Email Subject (mandantory)  
  -Body        -> Email content (mandantory)  
- -AttachmentFileName -> (optional)  
+ -Attachments -> File Path(s) (optional)  
  -SMTPServer  -> defaults to smtp.office365.com (optional)  
  -BodyAsHTML  -> Switch indicated if Body is in html  
  -Encoding    -> Encoding of the subject and the body one of "ASCII","UTF8","UniCode","UTF32","UTF7" (optional) defaults to "UTF8"  
  -From        -> From email adress. (optional) defaults to UserName from PSCredential Object    
- -Priority    -> one of "Low", "High", "Normal". (optional) defaults to "Normal"
+ -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
+ -InlineAttachemnt -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
