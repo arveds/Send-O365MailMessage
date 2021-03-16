@@ -74,8 +74,8 @@ Syntax:
  -Body        -> Email content (mandantory)  
  -Attachments -> File Path(s) (optional)  
  -SMTPServer  -> defaults to smtp.office365.com (optional)  
- -BodyAsHTML  -> Switch indicated if Body is in html  
+ -BodyAsHTML  -> Switch indicates if Body is in html  
  -Encoding    -> Encoding of the subject and the body one of "ASCII","UTF8","UniCode","UTF32","UTF7" (optional) defaults to "UTF8"  
  -From        -> From email adress. (optional) defaults to UserName from PSCredential Object    
  -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
- -InlineAttachemnt -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
+ -InlineAttachment -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
