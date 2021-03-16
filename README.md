@@ -1,8 +1,8 @@
 # Send-O365MailMessage
     
-This is a rework of the fantastic script here: https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1  
+This is inspried fantastic script here: https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1  
 **Kudos to gscales**. 
-There are so many changes, that this wasn't forked, because of the different intention to use the script.  
+Meanwhile there are so many changes, that this wasn't forked, because of the different intention to use the script.  
   
 ## Deprecation of Exchange online SMTP Basic auth  
 Microsoft will disable SMTP Basic auth in the second half of 2021 see [here](https://docs.microsoft.com/en-us/lifecycle/announcements/exchange-online-basic-auth-deprecated), [here](https://developer.microsoft.com/de-de/office/blogs/deferred-end-of-support-date-for-basic-authentication-in-exchange-online/) or in the [MessageCenter MC237741](https://app.cloudscout.one/evergreen-item/mc237741/) [MessageCenter MC204828](https://app.cloudscout.one/evergreen-item/mc204828/)
