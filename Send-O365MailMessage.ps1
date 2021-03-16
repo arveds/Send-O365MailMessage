@@ -2,6 +2,10 @@
 #
 # based on the highly apreciated work of gscales @ https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1
 #
+# dual-stack email sending, supports SMTP with OAUTH and GraphAPI with OAUTH
+#
+# Default is send via GraphAPI, with the -SendWithSMTP switch you can change to SMTP
+#
 # Source: https://github.com/arveds/Send-O365MailMessage/
 #
 # the Powershell.Module from the powershell Gallery MSAL.PS is requiered.
@@ -54,7 +58,7 @@
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-function Get-AccessTokenForSMTPSending {
+function Get-AccessTokenForMailSending {
     [CmdletBinding()]
     param (   
         [Parameter(Position = 1, Mandatory = $true)]
@@ -101,6 +105,7 @@ function Get-AccessTokenForSMTPSending {
     }
     
 }
+
 
 function Get-ContentTypeFromFileName{
     [CmdletBinding()]
@@ -495,10 +500,10 @@ function Send-O365MailMessage{
         [Collections.HashTable]
         $InlineAttachments,
         [Parameter(Mandatory = $false)]
-        [Object]
+        [string[]]
         $Cc,
         [Parameter(Mandatory = $false)]
-        [Object]
+        [string[]]
         $Bcc,
         [Parameter(Mandatory = $false)]
         [String]
@@ -517,19 +522,173 @@ function Send-O365MailMessage{
         $Encoding = "UTF8",
         [Parameter(Mandatory = $false)]
         [String]
-        $Priority = "Normal"
+        $Priority = "Normal",
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $SendwithSMTP
 
     )
-    Process {       
+    Process {
+        if([String]::IsNullOrEmpty($RedirectURI)){
+            $RedirectURI = "msal" + $ClientId + "://auth" 
+        }
+    
+    If(!$SendwithSMTP){
+        $MessageObj = [PSCustomObject]@{}
+    $MessageObj | Add-Member -MemberType NoteProperty -Name 'subject' -Value $subject
+
+    If($BodyAsHTML){
+        $contentType = "html"
+    }else{
+        $contentType = "text"
+    }
+    $BodyObj = [PSCustomObject]@{
+        contentType = $contentType
+        content = $body
+    }
+
+    $MessageObj | Add-Member -MemberType NoteProperty -Name 'body' -Value $BodyObj
+
+    $emailAddressArr = @()
+    Foreach ($item in $to) {
+        If ($item.Contains("<")){
+            $ADDRESSParts = $item.Split("<")
+            $NamePart = $ADDRESSParts[0].Trim(" ")
+            $mailPart = $ADDRESSParts[1].Trim(" ").TrimEnd(">")
+            $emailObj = [PSCustomObject]@{
+                address = $mailPart
+                name = $NamePart
+            }
+        }Else{
+            $mailPart = $item.Trim("<").Trim(">").Trim(" ")
+            $emailObj = [PSCustomObject]@{
+                address = $mailPart
+                name = ""
+            }
+        }
+         $emailAddressArr += [PSCustomObject]@{emailAddress = $emailObj}
+    }
+    $toRecipientsObj = @(
+        $emailAddressArr
+        )
+    $MessageObj | Add-Member -MemberType NoteProperty -Name 'toRecipients' -Value $toRecipientsObj
+
+    if(![String]::IsNullOrEmpty($Cc)){
+        $emailAddressArr = @()
+        Foreach ($item in $Cc) {
+            If ($item.Contains("<")){
+                $ADDRESSParts = $item.Split("<")
+                $NamePart = $ADDRESSParts[0].Trim(" ")
+                $mailPart = $ADDRESSParts[1].Trim(" ").TrimEnd(">")
+                $emailObj = [PSCustomObject]@{
+                    address = $mailPart
+                    name = $NamePart
+                }
+            }Else{
+                $mailPart = $item.Trim("<").Trim(">").Trim(" ")
+                $emailObj = [PSCustomObject]@{
+                    address = $mailPart
+                    name = ""
+                }
+            }
+            $emailAddressArr += [PSCustomObject]@{emailAddress = $emailObj}
+        }
+        $ccRecipientsObj = @(
+            $emailAddressArr
+        )
+        $MessageObj | Add-Member -MemberType NoteProperty -Name 'ccRecipients' -Value $ccRecipientsObj
+    }
+    if(![String]::IsNullOrEmpty($Bcc)){
+        $emailAddressArr = @()
+        Foreach ($item in $Bcc) {
+            If ($item.Contains("<")){
+                $ADDRESSParts = $item.Split("<")
+                $NamePart = $ADDRESSParts[0].Trim(" ")
+                $mailPart = $ADDRESSParts[1].Trim(" ").TrimEnd(">")
+                $emailObj = [PSCustomObject]@{
+                    address = $mailPart
+                    name = $NamePart
+                }
+            }Else{
+                $mailPart = $item.Trim("<").Trim(">").Trim(" ")
+                $emailObj = [PSCustomObject]@{
+                    address = $mailPart
+                    name = ""
+                }
+            }
+            $emailAddressArr += [PSCustomObject]@{emailAddress = $emailObj}
+        }
+        $bccRecipientsObj = @(
+            $emailAddressArr
+        )
+        $MessageObj | Add-Member -MemberType NoteProperty -Name 'bccRecipients' -Value $bccRecipientsObj
+    }
+    $hasAttachments = $false
+    if($null -ne $Attachments){
+        $AttachmentsArr = @()
+        $hasAttachments = $true
+        Foreach ($item in $Attachments) {
+            $EncodedFile =  [convert]::ToBase64String( [system.io.file]::readallbytes($item))
+            $FileType = (Get-ContentTypeFromFileName -FileName $item).MediaType
+            $attachedFileObj = [PSCustomObject]@{
+                '@odata.type' = "#microsoft.graph.fileAttachment"
+                name = $item.Split("\")[$item.Split("\").count -1]
+                contentBytes = $EncodedFile
+                contentType = "application/octet-stream" #$FileType
+            }
+            $AttachmentsArr += $attachedFileObj
+        }
+    }
+    if($null -ne $InlineAttachments){
+        $InlineAttachmentsArr = @()
+        $hasAttachments = $true
+        Foreach ($item in $InlineAttachments.GetEnumerator()) {
+            $FileName = $item.Value.ToString()
+            $EncodedFile =  [convert]::ToBase64String( [system.io.file]::readallbytes($FileName))
+            $FileType = (Get-ContentTypeFromFileName -FileName $FileName).MediaType
+            $InlineattachedFileObj = [PSCustomObject]@{
+                '@odata.type' = "#microsoft.graph.fileAttachment"
+                name = $FileName.Split("\")[$FileName.Split("\").count -1]
+                contentBytes = $EncodedFile
+                contentID = $item.Key
+                isInline = $true
+                contentType = $FileType
+            }
+            $InlineAttachmentsArr += $InlineattachedFileObj
+        }
+    }
+    If ($hasAttachments){
+        $allAttachments = $AttachmentsArr + $InlineAttachmentsArr
+        $MessageObj | Add-Member -MemberType NoteProperty -Name 'attachments' -Value $allAttachments
+    }
+
+    $ChangePrority = $false
+    switch ($Priority ){
+        "High" { $ChangePrority = $tue }
+        "Low" { $ChangePrority = $tue }  
+    }
+    If ($ChangePrority){
+        $MessageObj | Add-Member -MemberType NoteProperty -Name 'importance' -Value $Priority
+    }
+    $fullObj = [PSCustomObject]@{message = $MessageObj}
+    $jsonObj = $fullObj | ConvertTo-Json -Depth 50
+
+    $ApiUrl = "https://graph.microsoft.com/v1.0/me/sendMail"
+    $token = Get-AccessTokenForMailSending -Credential $cred -ClientId $ClientId -RedirectURI $RedirectURI -scopes "Mail.Send"
+    Invoke-RestMethod -Headers @{Authorization = "Bearer $token"} -Uri $ApiUrl -Method Post -Body $jsonObj -ContentType "application/json"
+
+    
+    
+    
+    
+    }
+    Else{       
 
         if([String]::IsNullOrEmpty($From)){
             $SendingAddress = $Credential.UserName
         }
         else{
             $SendingAddress = $From
-        }
-        if([String]::IsNullOrEmpty($RedirectURI)){
-            $RedirectURI = "msal" + $ClientId + "://auth" 
         } 
         # Building MailMessage Object       
         $mailMessage = New-Object System.Net.Mail.MailMessage
@@ -728,7 +887,7 @@ function Send-O365MailMessage{
         $SSLstreamWriter.WriteLine($command) 
         $AuthLoginResponse = $SSLstreamReader.ReadLine()
         write-host ($AuthLoginResponse)
-        $token = Get-AccessTokenForSMTPSending -Credential $Credential -ClientId $ClientId -RedirectURI $RedirectURI
+        $token = Get-AccessTokenForMailSending -Credential $Credential -ClientId $ClientId -RedirectURI $RedirectURI
         $SALSHeaderBytes = [System.Text.Encoding]::ASCII.GetBytes(("user=" + $Credential.UserName + [char]1 + "auth=Bearer " + $token + [char]1 + [char]1))
         $Base64AuthSALS = [Convert]::ToBase64String($SALSHeaderBytes)     
         #write-host -foregroundcolor DarkGreen $Base64AuthSALS
@@ -774,5 +933,6 @@ function Send-O365MailMessage{
             $sslStream.Close()
             Write-Host("Done")
         }  
+    }
     }
 }
