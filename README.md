@@ -26,7 +26,7 @@ The default is sending with the GraphAPI. With the -SendWithSMTP switch you can 
 ### Azure AD App registration
 The solution I propose is to register one(!) App for all clients in AzureAD (Public App / User credentials)  
 With the following properties:  
-API Permissions: SMTP.Send  
+API Permissions: SMTP.Send and Mail.Send
 Authentication: Redirect URI: the msal.....//auth (MSAL (only) Uri must be checked  
 Authentication: Allow public client flows: Yes  
 Authentication: Supported Accout types: Single tenant (your directory)  
@@ -74,7 +74,7 @@ Syntax:
  -To  	      -> Recipent email (mandantory)  
  -Cc          -> cc (optional)  
  -Bcc         -> bcc (optional)  
- - --------   -> Email Adresses can be added as `'Name somewhat <name@emaildomain.com>'` or `'anothername@emaildomain.com'` or as an array `-to 'email1@domain.com','Its me <email2@domain.com>'`  
+ ---------   -> Email Adresses can be added as `'Name somewhat <name@emaildomain.com>'` or `'anothername@emaildomain.com'` or as an array `-to 'email1@domain.com','Its me <email2@domain.com>'`  
  -RedirectURI -> RedirectURI as configured in the registed Azure AD App (optional) defaults to msal$ClientID://auth  
  -Attachments -> File Path(s) (optional)  
  -SMTPServer  -> defaults to smtp.office365.com (optional)  
