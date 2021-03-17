@@ -19,6 +19,10 @@ The good news are, that there is a PowerShell module from the PowerShell Gallery
 
 ## Solution
 Long story told short: 
+### Dual Stack  
+there are two options to solve this, the GraphAPI and SMTP OAUTH. 
+The default is sending with the GraphAPI. With the -SendWithSMTP switch you can change to send via SMTP/OAUTH.  
+
 ### Azure AD App registration
 The solution I propose is to register one(!) App for all clients in AzureAD (Public App / User credentials)  
 With the following properties:  
@@ -48,7 +52,7 @@ check if PowerShellGet is higher than 1.0.0.1
 close shell and ISE and check back again  
   
 ### Send-O365MailMessage.ps1  
-This script implements -more or less- a handcrafted SMTP STARTTLS XOAUTH2 client.  
+This script implements -more or less- a handcrafted SMTP STARTTLS XOAUTH2 client. And a GraphAPI based solution 
   
 If there are better ways, any solution is very welcome  
   
@@ -80,3 +84,5 @@ Syntax:
  -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
  -InlineAttachment -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
  -Port        -> SMTP Port (optional). defaults to 587
+ -SendWithSMTP -> change the sending from GraphAPI to SMTP w/ OAUTH (optional) 
+   
