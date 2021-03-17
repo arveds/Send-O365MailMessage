@@ -83,6 +83,6 @@ Syntax:
  -From        -> From email adress. (optional) defaults to UserName from PSCredential Object   
  -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
  -InlineAttachment -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
- -Port        -> SMTP Port (optional). defaults to 587
+ -Port        -> SMTP Port (optional). defaults to 587  
  -SendWithSMTP -> change the sending from GraphAPI to SMTP w/ OAUTH (optional) 
    
