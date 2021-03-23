@@ -534,9 +534,12 @@ function Send-O365MailMessage{
         }
     
     If(!$SendwithSMTP){
-        $MessageObj = [PSCustomObject]@{}
+    #send with Graph API
+    # we're creating an object to convert it to json later. 
+    $MessageObj = [PSCustomObject]@{}
     $MessageObj | Add-Member -MemberType NoteProperty -Name 'subject' -Value $subject
 
+    # Build the body section
     If($BodyAsHTML){
         $contentType = "html"
     }else{
@@ -548,7 +551,9 @@ function Send-O365MailMessage{
     }
 
     $MessageObj | Add-Member -MemberType NoteProperty -Name 'body' -Value $BodyObj
-
+    
+    # build recipient section
+    # to section
     $emailAddressArr = @()
     Foreach ($item in $to) {
         If ($item.Contains("<")){
@@ -572,7 +577,7 @@ function Send-O365MailMessage{
         $emailAddressArr
         )
     $MessageObj | Add-Member -MemberType NoteProperty -Name 'toRecipients' -Value $toRecipientsObj
-
+    # cc section
     if(![String]::IsNullOrEmpty($Cc)){
         $emailAddressArr = @()
         Foreach ($item in $Cc) {
@@ -598,6 +603,7 @@ function Send-O365MailMessage{
         )
         $MessageObj | Add-Member -MemberType NoteProperty -Name 'ccRecipients' -Value $ccRecipientsObj
     }
+    # bcc section
     if(![String]::IsNullOrEmpty($Bcc)){
         $emailAddressArr = @()
         Foreach ($item in $Bcc) {
@@ -623,6 +629,7 @@ function Send-O365MailMessage{
         )
         $MessageObj | Add-Member -MemberType NoteProperty -Name 'bccRecipients' -Value $bccRecipientsObj
     }
+    # create email attachments section
     $hasAttachments = $false
     if($null -ne $Attachments){
         $AttachmentsArr = @()
@@ -639,6 +646,7 @@ function Send-O365MailMessage{
             $AttachmentsArr += $attachedFileObj
         }
     }
+    # create section for inline attachemnts aka embedded files
     if($null -ne $InlineAttachments){
         $InlineAttachmentsArr = @()
         $hasAttachments = $true
@@ -657,33 +665,38 @@ function Send-O365MailMessage{
             $InlineAttachmentsArr += $InlineattachedFileObj
         }
     }
+    # both tyes are attachements from a technical view so we combine both
     If ($hasAttachments){
         $allAttachments = $AttachmentsArr + $InlineAttachmentsArr
         $MessageObj | Add-Member -MemberType NoteProperty -Name 'attachments' -Value $allAttachments
     }
-
+    
+    # message priority part
     $ChangePrority = $false
     switch ($Priority ){
-        "High" { $ChangePrority = $tue }
-        "Low" { $ChangePrority = $tue }  
+        "High" { $ChangePrority = $true }
+        "Low" { $ChangePrority = $true }  
     }
     If ($ChangePrority){
         $MessageObj | Add-Member -MemberType NoteProperty -Name 'importance' -Value $Priority
     }
     $fullObj = [PSCustomObject]@{message = $MessageObj}
+    
+    # convert all the stuff from above to json
     $jsonObj = $fullObj | ConvertTo-Json -Depth 50
 
     $ApiUrl = "https://graph.microsoft.com/v1.0/me/sendMail"
+    
+    # get the Token
     $token = Get-AccessTokenForMailSending -Credential $cred -ClientId $ClientId -RedirectURI $RedirectURI -scopes "Mail.Send"
+    
+    # ...aaaaaand send
     Invoke-RestMethod -Headers @{Authorization = "Bearer $token"} -Uri $ApiUrl -Method Post -Body $jsonObj -ContentType "application/json"
 
-    
-    
-    
-    
     }
     Else{       
-
+    # send with SMTP OAUTH 
+    	# fill the from field
         if([String]::IsNullOrEmpty($From)){
             $SendingAddress = $Credential.UserName
         }
@@ -693,7 +706,8 @@ function Send-O365MailMessage{
         # Building MailMessage Object       
         $mailMessage = New-Object System.Net.Mail.MailMessage
         $mailMessage.From = New-Object System.Net.Mail.MailAddress($SendingAddress)
-        Foreach ($item in $to) {
+        # to section
+	Foreach ($item in $to) {
             If ($item.Contains("<")){
                 $ADDRESSParts = $item.Split("<")
                 $NamePart = $ADDRESSParts[0].Trim(" ")
@@ -707,6 +721,7 @@ function Send-O365MailMessage{
             $mailMessage.To.Add($addressObj)
             }
         }
+	# cc section
         if(![String]::IsNullOrEmpty($Cc)){
             Foreach ($item in $Cc) {
                 If ($item.Contains("<")){
@@ -723,6 +738,7 @@ function Send-O365MailMessage{
                 }
             }
         }
+	# bcc section
         if(![String]::IsNullOrEmpty($Bcc)){
             Foreach ($item in $Bcc) {
                 If ($item.Contains("<")){
@@ -740,7 +756,9 @@ function Send-O365MailMessage{
             }
         }
         $mailMessage.Subject = $Subject
-        #$mailMessage.Body = $Body
+        
+	#$mailMessage.Body = $Body <- this might be expected, but we use the alternate view
+	#create the body
         if ($BodyAsHtml)
         {
             $bodyPart = [Net.Mail.AlternateView]::CreateAlternateViewFromString($Body, 'text/html')
@@ -751,7 +769,8 @@ function Send-O365MailMessage{
             $bodyPart = [Net.Mail.AlternateView]::CreateAlternateViewFromString($Body, 'text/plain')
         }   
         $mailmessage.AlternateViews.Add($bodyPart)
-
+	
+	# setup inline attachments aka embedded files
         if ($null -ne $InlineAttachments){
             foreach ($entry in $InlineAttachments.GetEnumerator()){
                 $file = $entry.Value.ToString()
@@ -771,7 +790,7 @@ function Send-O365MailMessage{
                 }
             }
         }
-
+	# setup attachments
         if ($null -ne $Attachments){
             foreach ($file in $Attachments){
                 try{
@@ -784,7 +803,8 @@ function Send-O365MailMessage{
                 }
             }
         }
-
+	
+	#set the encoding
         switch ($encoding){
             "ASCII" { $encodingObj = New-Object System.Text.ASCIIEncoding }
             "UTF8" { $encodingObj = New-Object System.Text.UTF8Encoding }
@@ -792,7 +812,7 @@ function Send-O365MailMessage{
             "UTF32" { $encodingObj = New-Object System.Text.UTF32Encoding }
             "UTF7" { $encodingObj = New-Object System.Text.UTF7Encoding }
         }
-        #
+        #set email priority
         switch ($Priority ){
             "Normal" { $mailMessage.Priority = 0 }
             "High" { $mailMessage.Priority = 2  }
