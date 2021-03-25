@@ -91,7 +91,7 @@ function Get-AccessTokenForMailSending {
  
         #if user consedt existis
         If(!$Prompt){
-            $tokenRequest = Get-MsalToken -UserCredential $cred -ClientId $ClientId -TenantId $TenantId -Scopes $scopes
+            $tokenRequest = Get-MsalToken -UserCredential $Credential -ClientId $ClientId -TenantId $TenantId -Scopes $scopes
         }
         #For one time user consent:
         else{
@@ -688,7 +688,7 @@ function Send-O365MailMessage{
     $ApiUrl = "https://graph.microsoft.com/v1.0/me/sendMail"
     
     # get the Token
-    $token = Get-AccessTokenForMailSending -Credential $cred -ClientId $ClientId -RedirectURI $RedirectURI -scopes "Mail.Send"
+    $token = Get-AccessTokenForMailSending -Credential $Credential -ClientId $ClientId -RedirectURI $RedirectURI -scopes "Mail.Send"
     
     # ...aaaaaand send
     Invoke-RestMethod -Headers @{Authorization = "Bearer $token"} -Uri $ApiUrl -Method Post -Body $jsonObj -ContentType "application/json"
