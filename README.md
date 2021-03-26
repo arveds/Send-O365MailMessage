@@ -20,7 +20,7 @@ The good news are, that there is a PowerShell module from the PowerShell Gallery
 ## Solution
 Long story told short: 
 ### Dual Stack  
-there are two options to solve this, the GraphAPI and SMTP OAUTH. 
+there are two options to solve this, the GraphAPI and SMTP OAUTH. I do not like the idea to use EWS, because deprecation of EWS by Microsoft is in the air.
 The default is sending with the GraphAPI. With the -SendWithSMTP switch you can change to send via SMTP/OAUTH.  
 
 ### Azure AD App registration
