@@ -67,8 +67,8 @@ to incorporate the functions into your script simply dot-source start the script
 ## Syntax
 Syntax:  
    
- -Credential  -> PSCredentialObject (Username and Password of the sending Office 365 account) (mandandtory)  
- -ClientID    -> The Application (client) ID of the registered Azure AD App (mandantory)  
+ -Credential  -> PSCredentialObject (Username and Password of the sending Office 365 account) (mandatory)  
+ -ClientID    -> The Application (client) ID of the registered Azure AD App (mandatory)  
  -Subject     -> Email Subject (mandantory)  
  -Body        -> Email content (mandantory)  
  -To  	      -> Recipent email (mandantory)  
