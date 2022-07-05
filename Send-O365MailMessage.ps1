@@ -91,11 +91,11 @@ function Get-AccessTokenForMailSending {
  
         #if user consedt existis
         If(!$Prompt){
-            $tokenRequest = Get-MsalToken -UserCredential $Credential -ClientId $ClientId -TenantId $TenantId -Scopes $scopes
+            $tokenRequest = Get-MsalToken -UserCredential $Credential -ClientId $ClientId -TenantId $TenantId -Scopes $scopes -RedirectUri $RedirectURI
         }
         #For one time user consent:
         else{
-            $tokenRequest = Get-MsalToken -ClientId $ClientId -TenantId $TenantId -LoginHint $cred.UserName -Scopes $scopes -Interactive
+            $tokenRequest = Get-MsalToken -ClientId $ClientId -TenantId $TenantId -LoginHint $cred.UserName -Scopes $scopes -RedirectUri $RedirectURI -Interactive
         }
  
         $AccessToken = $tokenRequest.AccessToken
