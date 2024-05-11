@@ -5,7 +5,7 @@ This is inspried fantastic script here: https://github.com/gscales/Powershell-Sc
 Meanwhile there are so many changes, that this wasn't forked, because of the different intention to use the script.  
   
 ## Deprecation of Exchange online SMTP Basic auth  
-Microsoft will disable SMTP Basic auth in the second half of 2021 see [here](https://docs.microsoft.com/en-us/lifecycle/announcements/exchange-online-basic-auth-deprecated), [here](https://developer.microsoft.com/de-de/office/blogs/deferred-end-of-support-date-for-basic-authentication-in-exchange-online/) or in the [MessageCenter MC237741](https://app.cloudscout.one/evergreen-item/mc237741/) [MessageCenter MC204828](https://app.cloudscout.one/evergreen-item/mc204828/)
+Microsoft disabled SMTP Basic auth in the second half of 2021 see [here](https://docs.microsoft.com/en-us/lifecycle/announcements/exchange-online-basic-auth-deprecated), [here](https://developer.microsoft.com/de-de/office/blogs/deferred-end-of-support-date-for-basic-authentication-in-exchange-online/) or in the [MessageCenter MC237741](https://app.cloudscout.one/evergreen-item/mc237741/) [MessageCenter MC204828](https://app.cloudscout.one/evergreen-item/mc204828/)
 
 For PowerShell sending Emails a soulution is needed.  
 
@@ -83,6 +83,8 @@ Syntax:
  -From        -> From email adress. (optional) defaults to UserName from PSCredential Object   
  -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
  -InlineAttachment -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
+ 
+ no longer working due to Microsofts SMTP switch off:
+ -SendWithSMTP -> change the sending from GraphAPI to SMTP w/ OAUTH (optional)  
  -Port        -> SMTP Port (optional). defaults to 587  
- -SendWithSMTP -> change the sending from GraphAPI to SMTP w/ OAUTH (optional) 
-   
+  
