@@ -84,7 +84,7 @@ Syntax:
  -Priority    -> one of "Low", "High", "Normal" [string]. (optional) defaults to "Normal"  
  -InlineAttachment -> Hashtable like `@{image1 = "C:\myimage.png"}` The name can be referenced in the html body to inline the file like `<img src="cid:image1">`.  
  
- no longer working due to Microsofts SMTP switch off:
+ no longer working due to Microsofts SMTP switch off:  
  -SendWithSMTP -> change the sending from GraphAPI to SMTP w/ OAUTH (optional)  
  -Port        -> SMTP Port (optional). defaults to 587  
   
