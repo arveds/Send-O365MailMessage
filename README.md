@@ -1,3 +1,7 @@
+# Disclaimer
+This solution is outdated, there are more elegant and easier ways to send emails via the Graph API. Please, look for other solutions.
+Sending with SMTP is disabled by Microsoft, so this part is obsolete and not working any longer.
+
 # Send-O365MailMessage
     
 This is inspried fantastic script here: https://github.com/gscales/Powershell-Scripts/blob/master/TLS-SMTP-Oauth-Mod.ps1  
